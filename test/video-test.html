@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>CGF 滤镜测试台（video + canvas）</title>
+<style>
+  body { margin: 0; background: #101114; color: #d8d8d8; font: 13px system-ui, sans-serif; }
+  .wrap { display: flex; gap: 8px; padding: 8px; }
+  .cell { flex: 1; }
+  .cap { opacity: .7; padding: 4px 2px; }
+  video, canvas { width: 100%; display: block; background: #000; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="cell">
+      <div class="cap">A · shadow root 里的 &lt;video&gt;</div>
+      <div id="hostA"></div>
+    </div>
+    <div class="cell">
+      <div class="cap">B · 普通 &lt;video&gt;</div>
+      <div id="hostB"></div>
+    </div>
+    <div class="cell">
+      <div class="cap">C · &lt;canvas&gt;（2D 动画，模拟 canvas 渲染的云游戏）</div>
+      <canvas id="cv" width="960" height="540"></canvas>
+    </div>
+  </div>
+  <script>
+    const SRC = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+    // A：放进 shadow root
+    const sr = document.getElementById('hostA').attachShadow({ mode: 'open' });
+    sr.innerHTML = '<video src="' + SRC + '" autoplay loop muted playsinline></video>';
+    // B：普通 video
+    const v = document.createElement('video');
+    v.src = SRC; v.autoplay = v.loop = v.muted = true; v.playsInline = true;
+    document.getElementById('hostB').appendChild(v);
+    // C：2D canvas，画高频细节（细网格 + 文字），方便量化"锐化有没有生效"
+    const cv = document.getElementById('cv');
+    const g = cv.getContext('2d');
+    let t = 0;
+    function draw() {
+      t += 0.02;
+      g.fillStyle = '#123';
+      g.fillRect(0, 0, cv.width, cv.height);
+      g.strokeStyle = '#9fd';
+      g.lineWidth = 1;
+      for (let x = 0; x < cv.width; x += 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 30 * Math.sin(t), cv.height); g.stroke(); }
+      for (let y = 0; y < cv.height; y += 6) { g.beginPath(); g.moveTo(0, y); g.lineTo(cv.width, y + 20 * Math.cos(t)); g.stroke(); }
+      g.fillStyle = '#ffd';
+      g.font = 'bold 64px system-ui';
+      g.fillText('CANVAS 渲染', 40, 120 + 10 * Math.sin(t * 2));
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    window.__probe = () => {
+      const pick = (el, kind) => el && ({ kind, size: (el.videoWidth || el.width) + 'x' + (el.videoHeight || el.height),
+        t: el.currentTime !== undefined ? +el.currentTime.toFixed(2) : undefined, paused: el.paused, filter: getComputedStyle(el).filter });
+      return JSON.stringify({
+        shadowVideo: pick(sr.querySelector('video'), 'video-shadow'),
+        plainVideo: pick(document.querySelector('#hostB video'), 'video-plain'),
+        canvas: pick(cv, 'canvas'),
+      });
+    };
+  </script>
+</body>
+</html>
