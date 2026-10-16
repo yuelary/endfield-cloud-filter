@@ -110,10 +110,10 @@ const kb = Buffer.byteLength(src) / 1024
 if (kb > 100) warnings.push(`脚本 ${kb.toFixed(1)} KB，偏大（用户脚本一般 <100 KB）`)
 
 console.log(`endfield-cloud-filter.user.js  ${kb.toFixed(1)} KB  @version ${version || '?'}`)
-for (const w of warnings) console.log('  ⚠️  ' + w)
-for (const e of errors) console.log('  ❌ ' + e)
+for (const w of warnings) console.log('  [警告] ' + w)
+for (const e of errors) console.log('  [错误] ' + e)
 if (errors.length) {
   console.log(`\n不通过：${errors.length} 个错误${STRICT ? '（--strict）' : ''}`)
   process.exit(1)
 }
-console.log(`\n通过 ✓${warnings.length ? `（${warnings.length} 个警告，发布时用 --strict 复查）` : ''}`)
+console.log(`\n通过${warnings.length ? `（${warnings.length} 个警告，发布时用 --strict 复查）` : ''}`)

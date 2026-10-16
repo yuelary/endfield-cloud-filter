@@ -57,7 +57,7 @@ Violentmonkey，Edge / Chrome / Firefox 都可以。
 
 ### 再装脚本
 
-**最省事**：打开安装页 <https://yuelary.github.io/endfield-cloud-filter/> ，点页面上的按钮 ✓
+**最省事**：打开安装页 <https://yuelary.github.io/endfield-cloud-filter/> ，点页面上的按钮
 
 **直接装**：点开下面这个地址，脚本管理器会弹出安装页：
 

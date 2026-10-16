@@ -59,10 +59,10 @@ node tools/serve.mjs                       # 起 http://127.0.0.1:8899 的安装
 
 ## 安全红线
 
-- ❌ 不读 `document.cookie`、不碰账号信息、不引入 `GM_*`（`@grant none` 是我们的隐私卖点，加 grant 会改变执行上下文）
-- ❌ 任何外部请求；`fetch` 只允许指向 `127.0.0.1`
-- ❌ 不用 `eval` / `new Function` / 远程代码
-- ✅ 改完必须同步更新 `CHANGELOG.md` 与头部 `@version`（CI 会校验一致）
+- 不读 `document.cookie`、不碰账号信息、不引入 `GM_*`（`@grant none` 是我们的隐私卖点，加 grant 会改变执行上下文）
+- 任何外部请求；`fetch` 只允许指向 `127.0.0.1`
+- 不用 `eval` / `new Function` / 远程代码
+- 改完必须同步更新 `CHANGELOG.md` 与头部 `@version`（CI 会校验一致）
 
 ## 发布
 

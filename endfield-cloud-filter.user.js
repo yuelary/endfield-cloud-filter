@@ -2,7 +2,7 @@
 // @name         云终末地滤镜
 // @name:en      Endfield Cloud Filter
 // @namespace    https://github.com/yuelary/endfield-cloud-filter
-// @version      1.6.5
+// @version      1.6.6
 // @description  给《云·终末地》网页版的画面加一层可调的后期处理：锐化、对比、饱和度、暗部提亮、色温。五个预设、按住按钮即可对比开关前后的差别；处理在本地完成，不经过服务器。
 // @description:en  Adjustable post-processing for the web version of Arknights: Endfield - sharpen, contrast, saturation, shadow lift and color temperature. Five presets, hold-to-compare, processed locally; nothing goes through a server.
 // @author       yuelary
@@ -544,7 +544,7 @@
       + '　已挂滤镜：视频 ' + d.filtering.videos + ' · 画布 ' + d.filtering.canvases];
     for (const el of d.elements) {
       lines.push('· ' + kindLabel(el.kind) + ' ' + el.size + ' @' + whereLabel(el.where)
-        + (el.filter && el.filter !== 'none' ? ' 已挂 ✓' : ' 没挂 ✗'));
+        + (el.filter && el.filter !== 'none' ? ' 已挂' : ' 没挂'));
     }
     if (!d.elements.length) lines.push('· 这个页面暂时没有画面元素（进游戏后再看）');
     noteEl.textContent = lines.join('\n');

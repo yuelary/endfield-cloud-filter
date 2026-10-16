@@ -1,4 +1,4 @@
-﻿<#
+<#
   tools/publish.ps1 —— 一条命令完成发布准备 + 推送
   ============================================================================
   用法（在你自己的终端里跑，或让 AI 跑；推送时会弹出 GitHub 登录窗，点一下即可）：
@@ -49,7 +49,7 @@ Get-ChildItem $root -Recurse -File -Include *.js, *.md, *.yml, LICENSE |
     if ($new -ne $text) { [System.IO.File]::WriteAllText($_.FullName, $new, $enc); Write-Host "   更新 $($_.Name)" }
   }
 
-# 先把版本号读出来（Select-String 是按行匹配；之前用 [regex]::Match 没开 Multiline，读到的是空字符串 ✗）
+# 先把版本号读出来（Select-String 是按行匹配；之前用 [regex]::Match 没开 Multiline，读到的是空字符串）
 $version = (Select-String -Path $scriptPath -Pattern '^// @version\s+(\S+)').Matches[0].Groups[1].Value
 if (-not $version) { throw '没能从脚本头部读出 @version，已停止' }
 Write-Host "   版本 $version"
@@ -73,12 +73,12 @@ if ($nodeExe) {
   & $nodeExe --check $scriptPath
   if ($LASTEXITCODE -ne 0) { throw '语法检查没过，已停止' }
   & $nodeExe "$root\tools\ci-check.mjs" --strict
-  if ($LASTEXITCODE -ne 0) { throw 'ci-check 没过（上面的 ❌ 就是原因），已停止' }
+  if ($LASTEXITCODE -ne 0) { throw 'ci-check 没过（上面的 就是原因），已停止' }
 } else {
   Write-Warning '系统里没找到 node —— 跳过两步自检。发布仍可继续，但少了一层保障（建议装一下 Node.js）。'
 }
 
-Write-Host "   版本 $version —— 自检通过 ✓" -ForegroundColor Green
+Write-Host "   版本 $version —— 自检通过" -ForegroundColor Green
 
 # ── ③ 本地提交 + tag ─────────────────────────────────────────────────────────
 Step '③' 'git init → 配置署名 → commit → tag'
@@ -114,6 +114,6 @@ git push -u origin main
 if ($LASTEXITCODE -ne 0) { throw "推送失败。常见原因：仓库还没在 GitHub 上建（先去 github.com/new 建一个**空**仓库，名字 $Repo，别勾 README）" }
 git push --tags
 
-Write-Host "`n✅ 全部完成。" -ForegroundColor Green
+Write-Host "`n 全部完成。" -ForegroundColor Green
 Write-Host '下一步（2 分钟）：去 https://greasyfork.org/ → 发布脚本 → 地址填下面这行 → 勾自动更新：'
 Write-Host "   https://raw.githubusercontent.com/$User/$Repo/main/$(Split-Path $scriptPath -Leaf)" -ForegroundColor Yellow
