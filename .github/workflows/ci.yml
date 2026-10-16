@@ -20,7 +20,7 @@ jobs:
           node-version: 22
 
       - name: 语法检查
-        run: node --check endfield-cloud-filter.user.js
+        run: node --check endfield-cloud-filte.user.js
 
       - name: 元数据 / 版本一致性 / 危险 API / 零外联
         run: node tools/ci-check.mjs
@@ -30,5 +30,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: endfield-cloud-filter.user.js
+          files: endfield-cloud-filte.user.js
           generate_release_notes: true

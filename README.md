@@ -5,7 +5,7 @@
 
 > ### ⚠️ 先说清楚：这是 **AI 写的**（vibe coded）
 > 需求、取舍、验收是人提的，**代码、审计、文档是 AI agent（DeepSeek Harness）写的**。
-> 用之前**请自己看一遍代码** —— 就 `endfield-cloud-filter.user.js` 一个文件，500 行出头，没有混淆、没有压缩、没有外链。
+> 用之前**请自己看一遍代码** —— 就 `endfield-cloud-filte.user.js` 一个文件，500 行出头，没有混淆、没有压缩、没有外链。
 > 我们宁可把这句话放在第一屏，也不藏在角落。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -89,14 +89,14 @@
 点这个链接，管理器会弹安装页：
 
 ```
-https://raw.githubusercontent.com/yuelary/endfield-cloud-filter/main/endfield-cloud-filter.user.js
+https://raw.githubusercontent.com/yuelary/endfield-cloud-filte/main/endfield-cloud-filte.user.js
 ```
 
 ### 方式三：本地 / 自建
 
 ```bash
-git clone https://github.com/yuelary/endfield-cloud-filter.git
-cd endfield-cloud-filter
+git clone https://github.com/yuelary/endfield-cloud-filte.git
+cd endfield-cloud-filte
 node tools/serve.mjs      # 起个只监听 127.0.0.1:8899 的静态服务
 # 浏览器打开 http://127.0.0.1:8899/ → 点安装
 ```
@@ -135,7 +135,7 @@ node tools/serve.mjs      # 起个只监听 127.0.0.1:8899 的静态服务
 ## 项目构成
 
 ```
-endfield-cloud-filter.user.js   脚本本体（唯一产物，直接就是可安装文件）
+endfield-cloud-filte.user.js   脚本本体（唯一产物，直接就是可安装文件）
 README.md  LICENSE  CHANGELOG.md
 AGENTS.md                   给 AI 协作者的说明（含三个踩过的坑）
 docs/                       截图
@@ -148,7 +148,7 @@ tools/cdp.mjs               调试工具：list / eval / inject / shot（需要�
 ## 开发与自测
 
 ```bash
-node --check endfield-cloud-filter.user.js        # 语法
+node --check endfield-cloud-filte.user.js        # 语法
 node tools/ci-check.mjs                       # 元数据 / 版本 / 危险 API 检查
 node tools/serve.mjs                          # 本地安装页
 ```
@@ -156,7 +156,7 @@ node tools/serve.mjs                          # 本地安装页
 **做 A/B 量化**（README 那张表就是这么来的）：
 
 1. 起一个带调试口的 Chromium（**独立 `--user-data-dir`**，别用日常配置）：`--remote-debugging-port=9222`
-2. `node tools/cdp.mjs inject video-test endfield-cloud-filter.user.js` 注入测试台
+2. `node tools/cdp.mjs inject video-test endfield-cloud-filte.user.js` 注入测试台
 3. 暂停视频在同一帧 → `__cgf.on = false` 截图 → 打开截图 → 用 OpenCV 比 `mean|Δ|` 与拉普拉斯方差
 
 ## 常见问题
@@ -173,7 +173,7 @@ node tools/serve.mjs                          # 本地安装页
 ## 贡献与反馈
 
 - 觉得有用 → 给个 ⭐
-- Bug / 新平台支持 → [Issues](https://github.com/yuelary/endfield-cloud-filter/issues)
+- Bug / 新平台支持 → [Issues](https://github.com/yuelary/endfield-cloud-filte/issues)
 - 提 PR 前请跑一遍 `tools/ci-check.mjs`
 
 ## 许可与致谢
@@ -188,4 +188,4 @@ node tools/serve.mjs                          # 本地安装页
 
 **本项目是 AI 协作完成的**：需求、取舍、验收由使用者提出，代码、审计与文档由 AI agent（DeepSeek Harness）写。
 
-⇒ **用之前请自己看一遍代码**（就 `endfield-cloud-filter.user.js` 一个文件，400 行出头，没有混淆、没有外链）。我们知道这句话该说，就写在 README 里，而不是藏在角落。
+⇒ **用之前请自己看一遍代码**（就 `endfield-cloud-filte.user.js` 一个文件，400 行出头，没有混淆、没有外链）。我们知道这句话该说，就写在 README 里，而不是藏在角落。

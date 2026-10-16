@@ -6,7 +6,7 @@
 ## 项目概览
 
 一个**单文件用户脚本**：给网页云游戏叠一层类似 NVIDIA Freestyle 的后处理滤镜。
-唯一产物就是 `endfield-cloud-filter.user.js`（无构建、无依赖、无打包）。改完直接就是可安装文件。
+唯一产物就是 `endfield-cloud-filte.user.js`（无构建、无依赖、无打包）。改完直接就是可安装文件。
 
 **不可动摇的三条约束：**
 
@@ -36,7 +36,7 @@
 ## 构建与测试
 
 ```bash
-node --check endfield-cloud-filter.user.js     # 语法（CI 也会跑）
+node --check endfield-cloud-filte.user.js     # 语法（CI 也会跑）
 node tools/ci-check.mjs                    # 元数据 / 版本一致性 / 危险 API
 node tools/serve.mjs                       # 起 http://127.0.0.1:8899 的安装页
 ```
@@ -45,7 +45,7 @@ node tools/serve.mjs                       # 起 http://127.0.0.1:8899 的安装
 
 1. 用一个**独立 `--user-data-dir`** 的 Chromium 起调试口：`--remote-debugging-port=9222`
    （⚠️ 绝不要拿使用者的日常浏览器配置去开调试口，也不要把它复制出去 —— 那里面是 cookie）
-2. `node tools/cdp.mjs inject video-test endfield-cloud-filter.user.js` 注入 `test/video-test.html`
+2. `node tools/cdp.mjs inject video-test endfield-cloud-filte.user.js` 注入 `test/video-test.html`
    （测试台里刻意放了：shadow DOM 里的 video、普通 video、一个 2D canvas）
 3. 期望：三者 `getComputedStyle(el).filter` 都等于 `url("#cgf-filter")`
 4. 量化：暂停在同一帧 → `__cgf.on = false` 截图 → 打开截图 → 用 OpenCV 比 `mean|Δ|` 与拉普拉斯方差
