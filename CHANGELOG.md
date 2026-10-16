@@ -3,6 +3,11 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与 [语义化版本](https://semver.org/lang/zh-CN/)。
 版本号同时出现在 `CHANGELOG.md` 与用户脚本头部的 `@version`（CI 会校验一致）。
 
+## [1.6.3] - 2026-10-16
+
+### 修复
+
+- 补回丢失的 @icon（上一步替换时整行被吃掉），指向仓库里的 icons/icon.png`n
 ## [1.6.2] - 2026-10-16
 
 ### 变更
