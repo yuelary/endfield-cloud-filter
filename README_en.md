@@ -28,7 +28,7 @@
   </a>
 </p>
 
-Everything is processed locally in your browser. Nothing goes through a server, and no extra latency is added.
+Everything is processed locally in your browser; nothing goes through a server.
 
 ![Panel](docs/panel.png)
 

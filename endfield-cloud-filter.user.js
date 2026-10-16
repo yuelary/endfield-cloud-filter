@@ -2,9 +2,9 @@
 // @name         云终末地滤镜
 // @name:en      Endfield Cloud Filter
 // @namespace    https://github.com/yuelary/endfield-cloud-filter
-// @version      1.6.4
-// @description  给《云·终末地》网页版的画面加一层可调的后期处理：锐化、对比、饱和度、暗部提亮、色温。五个预设、按住按钮即可对比开关前后的差别；处理在本地完成，不经过服务器，不额外增加延迟。
-// @description:en  Adjustable post-processing for the web version of Arknights: Endfield - sharpen, contrast, saturation, shadow lift and color temperature. Five presets, hold-to-compare, processed locally with no added latency.
+// @version      1.6.5
+// @description  给《云·终末地》网页版的画面加一层可调的后期处理：锐化、对比、饱和度、暗部提亮、色温。五个预设、按住按钮即可对比开关前后的差别；处理在本地完成，不经过服务器。
+// @description:en  Adjustable post-processing for the web version of Arknights: Endfield - sharpen, contrast, saturation, shadow lift and color temperature. Five presets, hold-to-compare, processed locally; nothing goes through a server.
 // @author       yuelary
 // @license      MIT
 // @copyright    2026, yuelary
@@ -29,7 +29,7 @@
  * 云终末地滤镜 v1.6（用户脚本 · 单文件无依赖）
  * ============================================================================
  * 一句话：给网页云游戏叠一层类似 NVIDIA Freestyle 的后处理 —— 锐化 / 对比 S 曲线 /
- * 饱和度 / 暗部提亮 / 色温。**零额外帧延迟**（合成器直接吃 CSS/SVG 滤镜）。
+ * 饱和度 / 暗部提亮 / 色温。
  *
  * 为什么这么做（2026-10-16 实读云·终末地 index.cda000.js 得出的结论）：
  *   ① 视频轨走 WebRTC MediaStream → <video>.srcObject（RTCPeerConnection×4、srcObject×8、
@@ -39,7 +39,7 @@
  *      ⇒ 页面上可能压根没有在播的 <video>；只处理 video 等于没装（这一版两样都管）。
  *   ③ 站点自己也在用 CSS filter 调色（源码里的 _currentColorEnhanceLevel）
  *      ⇒ 我们的规则要带 !important 才压得住。
- *   SVG 滤镜由合成器直接吃，锐化/曲线都能做，还省掉每帧拷贝。
+ *   用 SVG 滤镜实现：锐化、对比曲线、饱和、色温都能做，也不用自己维护像素管线。
  *
  * v1.1 修的两个真问题：
  *   ① **shadow DOM**：有些播放器把 <video> 放进 shadow root —— 文档级的
@@ -184,14 +184,14 @@
       target.replaceChildren(...[...parsed.childNodes].map((n) => document.importNode(n, true)));
     }
     // !important：压过站点自己的 filter（云·终末地源码里有 _currentColorEnhanceLevel）
-    style.textContent = settings.on ? 'video{filter:url(#' + FID + ') !important}' : '';
+    style.textContent = (settings.on && !tempOff) ? 'video{filter:url(#' + FID + ') !important}' : '';
   }
   /* ── 行内保险：直接给"画面元素"打 filter（带 !important） ──
    * ⚠️ 2026-10-16 第二次踩坑（用户反馈"只能给视频用啊"）：**云游戏不一定画在 <video> 上**。
    *    云·终末地的包里是 `this.canvas.width = e.displayWidth; r.texImage2D(..., e)`
    *    ⇒ 主渲染路径是 **WebCodecs 解出 VideoFrame → 画进 WebGL canvas**，
    *      页面上可能压根没有在播的 <video>（它另有一个 <video id="WelinkGameVideo"> 走 WebRTC 备用）。
-   *    ⇒ canvas 也得滤。CSS filter 对 canvas 一样有效，依然是合成器直接吃、零拷贝、零额外帧延迟。
+   *    ⇒ canvas 也得滤。CSS filter 对 canvas 一样有效。
    * 只滤"够大"的元素（小 canvas 多半是 UI/图标，别动），canvas 只取最大的两个。 */
   const MIN_W = 200, MIN_H = 150;
   function sizeOf(el) {
@@ -222,13 +222,38 @@
     if (settings.canvas === false) cvs = [];
     return { vids, cvs: cvs.slice(0, 2) };
   }
+  /**
+   * 行内保险：直接给画面元素打 filter（带 !important）。
+   *
+   * 注意（2026-10-16 外部代码审阅指出，属实）：开滤镜会盖掉元素**原本的行内 filter** ——
+   * 而站点自己也可能在设（本站源码里就有 _currentColorEnhanceLevel）。
+   * 所以关滤镜时**不能简单 removeProperty**，那会把站点自己的设置一起删掉。
+   * 这里先把原值连同优先级记下来（WeakMap，元素回收时自动释放），关闭时原样还原。
+   */
+  const inlineBackup = new WeakMap();
   function applyInline() {
     const { vids, cvs } = surfaceTargets();
+    const ours = 'url(#' + FID + ')';
+    const isOurs = (el) => el.style.getPropertyValue('filter').includes('#' + FID);
     const set = (el) => {
-      try {
-        if (settings.on) el.style.setProperty('filter', 'url(#' + FID + ')', 'important');
-        else el.style.removeProperty('filter');
-      } catch { /* 忽略 */ }
+      soft('套用行内滤镜', () => {
+        if (settings.on && !tempOff) {
+          // 只在当前这层不是我们写的时，记录被顶掉的原值。
+          // （站点可能在我们之后才设自己的 filter，所以不能只在第一次见面时记一次）
+          if (!isOurs(el)) {
+            inlineBackup.set(el, {
+              value: el.style.getPropertyValue('filter'),
+              priority: el.style.getPropertyPriority('filter'),
+            });
+          }
+          el.style.setProperty('filter', ours, 'important');
+        } else if (isOurs(el)) {
+          // 只有确认这层是我们写的，才动它；站点自己改过就原样留着，别碰
+          const bak = inlineBackup.get(el);
+          if (bak && bak.value) el.style.setProperty('filter', bak.value, bak.priority);
+          else el.style.removeProperty('filter');
+        }
+      });
     };
     vids.forEach(set);
     cvs.forEach(set);
@@ -249,8 +274,11 @@
     ensureIn(document);                     // 文档级
     scopes.forEach((r) => { if (r !== document) rebuildIn(r); });
     applyInline();                          // 行内保险
-    save();
+    // 这里**不** save()：重建也会被「按住对比」这类临时操作触发，存了就会留下意外状态
   }
+
+  /** 用户真的改了设置：存盘 + 重建（临时操作走 rebuildAll，不走这里） */
+  function commit() { save(); rebuildAll(); }
 
   // ① 劫持 attachShadow：之后创建的 shadow root 也自动覆盖
   try {
@@ -340,6 +368,7 @@
   /* ── 面板（只在顶层文档建一个，放 shadow DOM 里避免被页面 CSS 影响） ── */
   let shadow = null, panel = null, noteEl = null, holdBtn = null, fabEl = null;
   let collapsed = false;
+  let tempOff = false;   // 「按住对比」的临时关闭：只活在内存里，不写入 settings、不落盘
   /** 收起 / 展开（收起 = 面板隐藏、悬浮球出现） */
   function setCollapsed(v) {
     collapsed = !!v;
@@ -431,7 +460,7 @@
       input.addEventListener('input', () => {
         settings[key] = +input.value;
         row.querySelector('[data-v]').textContent = (+input.value).toFixed(2);
-        rebuildAll();
+        commit();
       });
       row.appendChild(input);
       rows.appendChild(row);
@@ -444,7 +473,7 @@
     for (const name of Object.keys(PRESETS)) {
       const btn = document.createElement('button');
       btn.textContent = name;
-      btn.addEventListener('click', () => { Object.assign(settings, PRESETS[name]); syncUi(); rebuildAll(); });
+      btn.addEventListener('click', () => { Object.assign(settings, PRESETS[name]); syncUi(); commit(); });
       box.appendChild(btn);
     }
   }
@@ -454,15 +483,17 @@
   function wireToggle() {
     const tog = shadow.getElementById('tog');
     tog.textContent = settings.on ? '关掉滤镜' : '打开滤镜';
-    tog.addEventListener('click', () => { settings.on = !settings.on; syncUi(); rebuildAll(); });
+    tog.addEventListener('click', () => { settings.on = !settings.on; syncUi(); commit(); });
   }
 
   /** 「按住对比」：按住时临时关掉滤镜，松开恢复 —— 一眼看出前后差异 */
   function wireHold() {
     holdBtn = shadow.getElementById('hold');
-    const apply = (v) => { const bak = settings.on; settings.on = v; rebuildAll(); settings.on = bak; };
-    const down = (e) => { e.preventDefault(); apply(false); holdBtn.textContent = '松开恢复…'; };
-    const up = () => { apply(settings.on); holdBtn.textContent = '按住对比'; };
+    // 按下时只翻这个内存里的临时开关：**不动 settings、不落盘**。
+    // （原来借 settings.on 来回切，会经 rebuildAll → save() 把「关闭」写进 localStorage，
+    //   万一按住期间刷新或崩溃，滤镜就永久留在关闭状态。审阅指出，属实。）
+    const down = (e) => { e.preventDefault(); tempOff = true; rebuildAll(); holdBtn.textContent = '松开恢复…'; };
+    const up = () => { if (!tempOff) return; tempOff = false; rebuildAll(); holdBtn.textContent = '按住对比'; };
     holdBtn.addEventListener('pointerdown', down);
     holdBtn.addEventListener('pointerup', up);
     holdBtn.addEventListener('pointerleave', up);
@@ -564,9 +595,9 @@
   try {
     window.__cgf = {
       get settings() { return { ...settings }; },
-      set(patch) { Object.assign(settings, patch || {}); syncUi(); rebuildAll(); return { ...settings }; },
-      preset(name) { if (PRESETS[name]) { Object.assign(settings, PRESETS[name]); syncUi(); rebuildAll(); } return { ...settings }; },
-      set on(v) { settings.on = !!v; syncUi(); rebuildAll(); },
+      set(patch) { Object.assign(settings, patch || {}); syncUi(); commit(); return { ...settings }; },
+      preset(name) { if (PRESETS[name]) { Object.assign(settings, PRESETS[name]); syncUi(); commit(); } return { ...settings }; },
+      set on(v) { settings.on = !!v; syncUi(); commit(); },
       get on() { return settings.on; },
       get scopes() { return scopes.size; },
       diagnose,
