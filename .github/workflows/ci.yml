@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# 新仓库默认的 GITHUB_TOKEN 权限可能是只读，那样「附到 Release」这一步会失败 —— 显式要写权限
+permissions:
+  contents: write
+
+# 被新提交取代的那次运行直接取消：强推（amend 覆盖历史）后，旧提交会变成不可达，
+# 针对它的运行会在 checkout 阶段失败并给你发一封失败邮件 —— 取消掉就不会有这封邮件。
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 语法检查
+        run: node --check endfield-cloud-filter.user.js
+
+      - name: 元数据 / 版本一致性 / 危险 API / 零外联
+        run: node tools/ci-check.mjs
+
+      # 发布（打 tag 时把 .user.js 附到 release 上，用户可直装）
+      - name: 附到 Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: endfield-cloud-filter.user.js
+          generate_release_notes: true

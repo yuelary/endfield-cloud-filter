@@ -1,0 +1,49 @@
+# 部署 GitHub Pages 安装页
+#
+# 用法：Pages 开关打开一次之后，改 index.html / 图标 / 脚本会自动重新发布；
+#       也可以随时到 Actions 页面手动跑（Run workflow）。
+# 跑完后安装页地址：https://yuelary.github.io/endfield-cloud-filter/
+#
+# 说明：不做路径过滤 —— 强推（amend 后覆盖历史）时 GitHub 报给 workflow 的变更文件列表是空的，按路径过滤会静默跳过。
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  # GitHub 现在强制用 Node 24 跑这些 action，显式声明一下就不会再报那条黄色警告
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # 只发布安装页需要的东西，别把 test/ tools/ 也推上站点
+      - name: 准备站点目录
+        run: |
+          mkdir -p _site/icons
+          cp index.html endfield-cloud-filter.user.js _site/
+          cp icons/icon.png _site/icons/ 2>/dev/null || true
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
