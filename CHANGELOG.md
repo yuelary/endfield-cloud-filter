@@ -18,7 +18,7 @@
 ### 变更
 - **默认零上报**：调试上报改为 opt-in（`localStorage['cgf-debug'] = '1'` 才发，且只发本机）
 - `@match` 收紧：移除 `file:///*` 与 `*://127.0.0.1/*`
-- 发布用文件名改为 `endfield-cloud-filte.user.js`
+- 发布用文件名改为 `endfield-cloud-filter.user.js`
 
 ## [1.5.2] - 2026-10-16
 
