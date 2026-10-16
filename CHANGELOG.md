@@ -3,6 +3,13 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与 [语义化版本](https://semver.org/lang/zh-CN/)。
 版本号同时出现在 `CHANGELOG.md` 与用户脚本头部的 `@version`（CI 会校验一致）。
 
+## [1.6.2] - 2026-10-16
+
+### 变更
+
+- 脚本图标改用仓库里的 icons/icon.png（在脚本管理器的列表里显示更清楚）
+- README 改成居中版式，并把「不读数据 / 不改文件 / 不连外网」放到最显眼的位置
+
 ## [1.6.1] - 2026-10-16
 
 ### 变更

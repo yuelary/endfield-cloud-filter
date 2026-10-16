@@ -1,7 +1,21 @@
-# 云终末地滤镜
+<p align="center">
+  <img src="icons/icon.png" alt="云终末地滤镜" width="160" height="160" />
+</p>
 
-《云·终末地》网页版的画面滤镜。装好后，游戏画面上会多一层可调的后期处理：
-**锐化、对比、饱和度、暗部提亮、色温**。
+<h1 align="center">云终末地滤镜</h1>
+
+<p align="center">
+  《云·终末地》网页版的画面滤镜：<b>锐化、对比、饱和度、暗部提亮、色温</b>。<br />
+  参数随时可调，有 5 个预设；按住按钮就能对比开关前后的差别。<br />
+  <i>只改画面的显示效果 —— 不读游戏数据、不修改任何文件、不连接外部网络。</i>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.6.2-blue.svg" alt="version"></a>
+  <a href="https://github.com/yuelary/endfield-cloud-filter/releases"><img src="https://img.shields.io/github/v/release/yuelary/endfield-cloud-filter" alt="release"></a>
+  <img src="https://img.shields.io/badge/telemetry-none-brightgreen.svg" alt="telemetry: none">
+</p>
 
 处理在浏览器本地完成，不经过服务器，不会额外增加延迟。
 

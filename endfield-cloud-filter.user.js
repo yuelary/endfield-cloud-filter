@@ -2,7 +2,7 @@
 // @name         云终末地滤镜
 // @name:en      Endfield Cloud Filter
 // @namespace    https://github.com/yuelary/endfield-cloud-filter
-// @version      1.6.1
+// @version      1.6.2
 // @description  给《云·终末地》等网页云游戏叠一层类似 NVIDIA Freestyle 的后处理：锐化 · 对比 S 曲线 · 饱和度 · 暗部提亮 · 色温。纯 CSS/SVG，零额外帧延迟；<video> 和 canvas 渲染的流都管；参数按站点记忆。
 // @description:en  Freestyle-style post-processing for browser cloud gaming: sharpen, S-curve, saturation, shadow lift, color temperature. Pure CSS/SVG, zero added frame latency, works on both <video> and canvas-rendered streams. Per-site settings.
 // @author       yuelary
